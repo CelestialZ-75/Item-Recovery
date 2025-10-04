@@ -15,6 +15,7 @@ public:
     Contacts() { Contacts("NaN","NaN"); }                   // default: unvalid contact (not any name/number)
     string getName() { return name; }
     string getNum() { return num; }
+    void printContact();
 };
 
 class Item{
@@ -26,9 +27,11 @@ public:
     Item(string _name, string _de, Contacts _con):
         name(_name),description(_de),contacts(_con) {}
     Item() { Contacts _con; Item("NaN","NaD",_con); }       // default: unvalid item
+    ~Item() {}
     void addInfo(string _name, string _de, Contacts _con) { Item(_name,_de,_con); }
-    void changeInfo(string _name);                          // whats the index for item?
-    void deleteInfo(string _name);
+    void changeInfo(string _name, string _de, Contacts _con);                          
+    // void deleteInfo( Item(); );
+    void printItem();
 };
 
 #endif
