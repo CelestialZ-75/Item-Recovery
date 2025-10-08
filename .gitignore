@@ -1,0 +1,24 @@
+# 对象文件
+*.o
+*.obj
+
+# 可执行文件
+*.exe
+main
+output/main
+
+# 构建目录
+build/
+output/
+
+# 平台特定
+*.dll
+*.so
+*.dylib
+
+# 编辑器
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
