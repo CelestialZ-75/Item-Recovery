@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     Item mouse;
 
     ZHOU.addInfo("CZ","12121");
-    mouse.addInfo("mouse","a gift",ZHOU);
+    mouse.addInfo("mouse","a gift");
 
     mouse.printItem(); 
 }

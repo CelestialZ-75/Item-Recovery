@@ -1,6 +1,6 @@
 #include "item.h"
 
-void unvalidPrint(string _type) { cout << "No Valid" << _type << endl; }
+void unvalidPrint(string _type) { cout << "No Valid " << _type << endl; }
 
 void Contacts::printContact() {
     if (name != "NaN")
@@ -25,16 +25,13 @@ void Item::printItem() {
     else
         unvalidPrint("Item Name");
 
-    if (name != "NaN")
+    if (description != "NaD")
         cout << "Description: " << description << endl;
     else
         unvalidPrint("Description");
-
-    contacts.printContact();
 }
 
-void Item::addInfo(string _name, string _de, Contacts _con) {
+void Item::addInfo(string _name, string _de) {
         name = _name;
         description = _de;
-        contacts = _con;
 }
