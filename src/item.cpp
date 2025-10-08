@@ -14,6 +14,11 @@ void Contacts::printContact() {
         unvalidPrint("Contact Name");
 }
 
+void Contacts::addInfo(string _name, string _num) {
+    name = _name;
+    num = _num;
+}
+
 void Item::printItem() {
     if (name != "NaN")
         cout << "Item Name:" << name << endl;
@@ -26,4 +31,10 @@ void Item::printItem() {
         unvalidPrint("Description");
 
     contacts.printContact();
+}
+
+void Item::addInfo(string _name, string _de, Contacts _con) {
+        name = _name;
+        description = _de;
+        contacts = _con;
 }

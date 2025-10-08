@@ -13,9 +13,10 @@ class Contacts {
   public:
     Contacts(string _name, string _num) : name(_name), num(_num) {}
     Contacts()
-        : Contacts("NaN", "NaN") {}                                 // default: unvalid contact (not any name/number)
+        : Contacts("NaN", "NaN") {} // default: unvalid contact (not any name/number)
     string getName() { return name; }
     string getNum() { return num; }
+    void addInfo(string _name, string _num);
     void printContact();
 };
 
@@ -28,11 +29,9 @@ class Item {
   public:
     Item(string _name, string _de, Contacts _con)
         : name(_name), description(_de), contacts(_con) {}
-    Item() : Item("NaN", "NaD", Contacts()) {}                      // default: unvalid item
+    Item() : Item("NaN", "NaD", Contacts()) {} // default: unvalid item
     ~Item() {}
-    void addInfo(string _name, string _de, Contacts _con) { Item(_name, _de, _con); }
-    void changeInfo(string _name, string _de, Contacts _con);
-    // void deleteInfo( Item(); );
+    void addInfo(string _name, string _de, Contacts _con); 
     void printItem();
 };
 
