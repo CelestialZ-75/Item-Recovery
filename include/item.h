@@ -35,6 +35,7 @@ class Item {
     void addInfo(string _name, string _de); 
     void deleteInfo() {addInfo("NaN", "NaD");}
     void printItem();
+    string getName() { return name; }
 };
 
 #endif
