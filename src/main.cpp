@@ -1,14 +1,17 @@
 #include <iostream>
 
 #include "item.h"
+#include "inventory.h"
 
 int main(int argc, char *argv[])
 {
-    Contacts ZHOU;
-    Item mouse;
-
-    ZHOU.addInfo("CZ","12121");
-    mouse.addInfo("mouse","a gift");
-
-    mouse.printItem(); 
+    char input = '0';
+    vector<Item> v;
+    Inventory e(v); 
+    while(input != 'e'){
+        helloCommand();
+        cin >> input;
+    
+        entrySelect(input);
+    }
 }

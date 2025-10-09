@@ -13,9 +13,9 @@ private:
 
 public:
     Inventory(vector<Item> &_e): entry(_e) {};
-    int traverseFindItem(string _name);
+    int findItem(string _name);
     void addItem(Item _item) { entry.push_back(_item); }
-    bool traverseDeleteItem(string _name); 
+    bool deleteItem(string _name); 
 };
 
 
