@@ -14,54 +14,57 @@ void Interface::helloCommand() {
 
 void Interface::entrySelect(char input) {
     string name, de, c_name, c_num;
-    while (input != 'e') {
-        switch (input) {
-            case '1':
-                printf("Enter new Item Name: ");
-                cin >> name;
-                printf("Enter new Item Description: ");
-                cin >> de;
-                printf("Enter Item Contact Name: ");
-                cin >> c_name;
-                printf("Enter Item Contact Num: ");
-                cin >> c_num;
+    switch (input) {
+        case '1':
+            printf("Enter new Item Name: ");
+            cin >> name;
+            printf("Enter new Item Description: ");
+            cin >> de;
+            printf("Enter Item Contact Name: ");
+            cin >> c_name;
+            printf("Enter Item Contact Num: ");
+            cin >> c_num;
 
-                if (!isUnvalidN(name) && !isUnvalidD(de)) {
-                    if (!isUnvalidN(c_name) && !isUnvalidN(c_num)) {
-                        con_v.push_back(Contacts(c_name, c_num));
-                        inv.addItem(Item(name, de, con_v.back()));
-                    } else {
-                        cout
-                            << "Unvalid Contact Name or Num, plz re-enter Name or exit: ";
-                        cin >> input;
-                    }
+            if (!isUnvalidN(name) && !isUnvalidD(de)) {
+                if (!isUnvalidN(c_name) && !isUnvalidN(c_num)) {
+                    con_v.push_back(Contacts(c_name, c_num));
+                    inv.addItem(Item(name, de, con_v.back()));
+                } else {
+                    cout << "Unvalid Contact Name or Num, plz re-enter entry num: ";
+                    cin >> input;
+                    entrySelect(input);
                 }
+            }
 
-                if (input == 'e')
-                    break;
-                else
-                    input == 'x';
+            break;
 
-                break;
+        case '2':
+            printf("Enter Target Item Name: ");
+            cin >> name;
+            if (inv.deleteItem(name))
+                cout << "Delete Successful" << endl;
+            else
+                cout << "Delete Unsuccessful" << endl;
+            break;
 
-            case '2':
-                printf("Enter Target Item Name: ");
-                cin >> name;
-                if(inv.deleteItem(name)) cout << "Delete Successful" << endl;
-                else cout << "Delete Unsuccessful" << endl;
-                break;
+        case '3':
+            inv.printInv();
+            break;
 
-            case '3':
-                break;
-            
-            case '4':
-                break;
+        case '4':
+            printf("Enter Target Item Name: ");
+            cin >>  name;
+            unsigned int index;
+            if ((index = inv.findItem(name)) != inv.getSize()) {
+                inv.printItem(index);
+            }
+            else {
+                cout << "Target not Found" << endl;
+            }
+            break;
 
-            case 'x':
-                break;
 
-            default:
-                break;
-        }
+        default:
+            break;
     }
 }

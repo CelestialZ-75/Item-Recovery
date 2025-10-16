@@ -30,8 +30,8 @@ void Item::printItem() {
     else
         unvalidPrint("Description");
 
-    if (con)
-        con->printContact();
+    if (con.getName() != "NaN")
+        con.printContact();
     else
         unvalidPrint("Contact Name or Num");
 }

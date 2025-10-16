@@ -25,12 +25,12 @@ class Item {
   private:
     string name;
     string description;
-    Contacts *con;
+    Contacts con;
 
   public:
     Item(string _name, string _de, Contacts &_con)
-        : name(_name), description(_de),con(&_con) {}
-    Item() : name("NaN"), description("NaD"), con(NULL) {} // default: unvalid item
+        : name(_name), description(_de),con(_con) {}
+    Item() : name("NaN"), description("NaD"), con() {} // default: unvalid item
     ~Item() {}
     void addInfo(string _name, string _de); 
     void deleteInfo() {addInfo("NaN", "NaD");}
