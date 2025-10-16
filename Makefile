@@ -7,12 +7,12 @@
 CXX = g++
 
 # define any compile-time flags
+# 添加 Qt 编译标志
 CXXFLAGS	:= -std=c++17 -Wall -Wextra -g
+QT_FLAGS    := -I/opt/homebrew/opt/qt/include -I/opt/homebrew/opt/qt/lib/QtCore.framework/Headers -I/opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers -I/opt/homebrew/opt/qt/lib/QtGui.framework/Headers
 
 # define library paths in addition to /usr/lib
-#   if I wanted to include libraries not in /usr/lib I'd specify
-#   their path using -Lpath, something like:
-LFLAGS =
+LFLAGS = -L/opt/homebrew/opt/qt/lib
 
 # define output directory
 OUTPUT	:= output
@@ -50,6 +50,9 @@ INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 # define the C libs
 LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 
+# Qt 库链接
+QT_LIBS     := -F/opt/homebrew/opt/qt/lib -framework QtCore -framework QtWidgets -framework QtGui
+
 # define the C source files
 SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))
 
@@ -74,18 +77,14 @@ $(OUTPUT):
 	$(MD) $(OUTPUT)
 
 $(MAIN): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(OUTPUTMAIN) $(OBJECTS) $(LFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(QT_FLAGS) -o $(OUTPUTMAIN) $(OBJECTS) $(LFLAGS) $(LIBS) $(QT_LIBS)
 
 # include all .d files
 -include $(DEPS)
 
 # this is a suffix replacement rule for building .o's and .d's from .c's
-# it uses automatic variables $<: the name of the prerequisite of
-# the rule(a .c file) and $@: the name of the target of the rule (a .o file)
-# -MMD generates dependency output files same name as the .o file
-# (see the gnu make manual section about automatic variables)
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -MMD $<  -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(QT_FLAGS) -c -MMD $<  -o $@
 
 .PHONY: clean
 clean:
