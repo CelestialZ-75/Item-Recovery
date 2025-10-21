@@ -102,3 +102,28 @@
 - 用户输入错误友好提示
 - 系统异常基础捕获
 - 操作失败明确反馈
+
+## 4 使用方法
+
+目前gui还未开发完成，需要删除mainwindow相关文件后执行。
+
+win端
+
+配置好cmake后，在文件根目录运行
+
+``` terminal
+make run
+mingw32-make run    // 如果直接执行make报错
+```
+
+mac端
+
+配置cmake：
+``` terminal
+brew install cmake make
+```
+
+运行：
+``` terminal
+make run
+```
