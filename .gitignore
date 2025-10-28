@@ -3,9 +3,9 @@
 *.obj
 
 # 可执行文件
-*.exe
-main
-output/main
+# *.exe
+# main
+# output/main
 
 # 构建目录
 build/
