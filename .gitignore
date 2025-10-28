@@ -9,7 +9,7 @@
 
 # 构建目录
 build/
-output/
+# output/
 
 # 平台特定
 *.dll
