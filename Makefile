@@ -9,10 +9,12 @@ CXX = g++
 # define any compile-time flags
 # 添加 Qt 编译标志
 CXXFLAGS	:= -std=c++17 -Wall -Wextra -g
-QT_FLAGS    := -I/opt/homebrew/opt/qt/include -I/opt/homebrew/opt/qt/lib/QtCore.framework/Headers -I/opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers -I/opt/homebrew/opt/qt/lib/QtGui.framework/Headers
+#QT_FLAGS    := -I/opt/homebrew/opt/qt/include -I/opt/homebrew/opt/qt/lib/QtCore.framework/Headers -I/opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers -I/opt/homebrew/opt/qt/lib/QtGui.framework/Headers
 
 # define library paths in addition to /usr/lib
 LFLAGS = -L/opt/homebrew/opt/qt/lib
+
+LDFLAGS += -static -static-libgcc -static-libstdc++
 
 # define output directory
 OUTPUT	:= output
@@ -51,7 +53,7 @@ INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 
 # Qt 库链接
-QT_LIBS     := -F/opt/homebrew/opt/qt/lib -framework QtCore -framework QtWidgets -framework QtGui
+# QT_LIBS     := -F/opt/homebrew/opt/qt/lib -framework QtCore -framework QtWidgets -framework QtGui
 
 # define the C source files
 SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))
