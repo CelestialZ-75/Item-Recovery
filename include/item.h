@@ -38,12 +38,15 @@ class Item {
     string description;    // 物品说明
     string address;        // 物品所在地址
     Contacts con;          // 联系人信息
-    ItemCategory category; // 物品类别
+    ItemCategory category; // 物品类别（保留用于向后兼容）
+    string typeName;       // 物品类型名称（动态类型）
 
   public:
     Item(string _name, string _de, string _addr, Contacts &_con, ItemCategory _cat)
-        : name(_name), description(_de), address(_addr), con(_con), category(_cat) {}
-    Item() : name("NaN"), description("NaD"), address("NaN"), con(), category(ItemCategory::OTHER) {}
+        : name(_name), description(_de), address(_addr), con(_con), category(_cat), typeName("") {}
+    Item(string _name, string _de, string _addr, Contacts &_con, string _typeName)
+        : name(_name), description(_de), address(_addr), con(_con), category(ItemCategory::OTHER), typeName(_typeName) {}
+    Item() : name("NaN"), description("NaD"), address("NaN"), con(), category(ItemCategory::OTHER), typeName("") {}
     virtual ~Item() {}
     void addInfo(string _name, string _de, string _addr); 
     void deleteInfo() {addInfo("NaN", "NaD", "NaN");}
@@ -52,6 +55,8 @@ class Item {
     string getDescription() { return description; }
     string getAddress() { return address; }
     ItemCategory getCategory() { return category; }
+    string getTypeName() { return typeName; }
+    void setTypeName(string _typeName) { typeName = _typeName; }
     Contacts& getContact() { return con; }
 };
 

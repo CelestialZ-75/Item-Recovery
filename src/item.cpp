@@ -42,14 +42,18 @@ void Item::printItem() {
         unvalidPrint("Address");
 
     // 显示类别
-    string catStr;
-    switch(category) {
-        case ItemCategory::FOOD: catStr = "食品"; break;
-        case ItemCategory::BOOK: catStr = "书籍"; break;
-        case ItemCategory::TOOL: catStr = "工具"; break;
-        default: catStr = "其他"; break;
+    if (!typeName.empty()) {
+        cout << "物品类型: " << typeName << endl;
+    } else {
+        string catStr;
+        switch(category) {
+            case ItemCategory::FOOD: catStr = "食品"; break;
+            case ItemCategory::BOOK: catStr = "书籍"; break;
+            case ItemCategory::TOOL: catStr = "工具"; break;
+            default: catStr = "其他"; break;
+        }
+        cout << "Category: " << catStr << endl;
     }
-    cout << "Category: " << catStr << endl;
 
     if (con.getName() != "NaN")
         con.printContact();
