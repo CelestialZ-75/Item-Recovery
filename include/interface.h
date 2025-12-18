@@ -21,6 +21,11 @@ class Interface {
     Interface();  // 默认构造函数
     Interface(Inventory &_inv) : inv(_inv), currentUser(nullptr) {};
     
+    // 公共访问器（用于 GUI）
+    Inventory& getInventory() { return inv; }
+    UserManager& getUserManager() { return userManager; }
+    ItemTypeManager& getItemTypeManager() { return itemTypeManager; }
+    
     // 用户相关方法
     bool login();
     void registerUser();

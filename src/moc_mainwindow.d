@@ -1,4 +1,4 @@
-src/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
+src/moc_mainwindow.o: src/moc_mainwindow.cpp src/../include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QMainWindow \
   /opt/homebrew/opt/qt/include/QtWidgets/qmainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/qtwidgetsglobal.h \
@@ -217,5 +217,11 @@ src/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QTabWidget \
   /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
   /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h \
-  /opt/homebrew/opt/qt/include/QtCore/QTextStream include/inventory.h \
-  include/item.h include/interface.h include/user.h include/itemtype.h
+  /opt/homebrew/opt/qt/include/QtCore/QTextStream \
+  src/../include/inventory.h src/../include/item.h \
+  src/../include/interface.h src/../include/user.h \
+  src/../include/itemtype.h \
+  /opt/homebrew/opt/qt/include/QtCore/qtmochelpers.h \
+  /opt/homebrew/opt/qt/include/QtCore/qtmocconstants.h \
+  /opt/homebrew/opt/qt/include/QtCore/q20algorithm.h \
+  /opt/homebrew/opt/qt/include/QtCore/q23type_traits.h

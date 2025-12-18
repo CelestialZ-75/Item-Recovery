@@ -1,4 +1,4 @@
-src/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
+src/main_gui.o: src/main_gui.cpp include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QMainWindow \
   /opt/homebrew/opt/qt/include/QtWidgets/qmainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/qtwidgetsglobal.h \
@@ -218,4 +218,18 @@ src/mainwindow.o: src/mainwindow.cpp include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
   /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h \
   /opt/homebrew/opt/qt/include/QtCore/QTextStream include/inventory.h \
-  include/item.h include/interface.h include/user.h include/itemtype.h
+  include/item.h include/interface.h include/user.h include/itemtype.h \
+  /opt/homebrew/opt/qt/include/QtWidgets/QApplication \
+  /opt/homebrew/opt/qt/include/QtWidgets/qapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreevent.h \
+  /opt/homebrew/opt/qt/include/QtCore/qbasictimer.h \
+  /opt/homebrew/opt/qt/include/QtCore/qabstracteventdispatcher.h \
+  /opt/homebrew/opt/qt/include/QtCore/qeventloop.h \
+  /opt/homebrew/opt/qt/include/QtCore/qdeadlinetimer.h \
+  /opt/homebrew/opt/qt/include/QtCore/qelapsedtimer.h \
+  /opt/homebrew/opt/qt/include/QtCore/qnativeinterface.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
+  /opt/homebrew/opt/qt/include/QtGui/qguiapplication.h \
+  /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
+  /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h

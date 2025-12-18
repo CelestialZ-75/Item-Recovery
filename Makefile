@@ -9,10 +9,26 @@ CXX = g++
 # define any compile-time flags
 # 添加 Qt 编译标志
 CXXFLAGS	:= -std=c++17 -Wall -Wextra -g
-#QT_FLAGS    := -I/opt/homebrew/opt/qt/include -I/opt/homebrew/opt/qt/lib/QtCore.framework/Headers -I/opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers -I/opt/homebrew/opt/qt/lib/QtGui.framework/Headers
+# 检测 Qt 路径 (macOS Homebrew)
+QT_PREFIX := $(shell brew --prefix qt 2>/dev/null || echo /opt/homebrew/opt/qt)
+QT_FLAGS := -I$(QT_PREFIX)/include -I$(QT_PREFIX)/include/QtCore -I$(QT_PREFIX)/include/QtWidgets -I$(QT_PREFIX)/include/QtGui
 
 # define library paths in addition to /usr/lib
-LFLAGS = -L/opt/homebrew/opt/qt/lib
+LFLAGS = -L$(QT_PREFIX)/lib
+
+# Qt 库链接 (macOS)
+QT_LIBS := -F$(QT_PREFIX)/lib -framework QtCore -framework QtWidgets -framework QtGui
+
+# 查找 MOC 工具
+MOC := $(shell find /opt/homebrew -name "moc" -type f 2>/dev/null | head -1)
+ifeq ($(MOC),)
+  # 尝试其他可能的位置
+  MOC := $(shell which moc-qt5 2>/dev/null || which moc 2>/dev/null || echo "")
+endif
+
+# 如果使用 pkg-config (Linux)
+# QT_FLAGS := $(shell pkg-config --cflags Qt5Widgets Qt5Core Qt5Gui 2>/dev/null)
+# QT_LIBS := $(shell pkg-config --libs Qt5Widgets Qt5Core Qt5Gui 2>/dev/null)
 
 LDFLAGS += -static -static-libgcc -static-libstdc++
 
@@ -55,11 +71,16 @@ LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 # Qt 库链接
 # QT_LIBS     := -F/opt/homebrew/opt/qt/lib -framework QtCore -framework QtWidgets -framework QtGui
 
+# MOC 生成的文件（先定义，用于排除）
+MOC_HEADERS := $(INCLUDE)/mainwindow.h
+MOC_SOURCES := $(patsubst $(INCLUDE)/%.h,$(SRC)/moc_%.cpp,$(MOC_HEADERS))
+
 # define the C source files
-SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))
+# 排除命令行版本的 main.cpp 和 MOC 生成的文件，使用 GUI 版本的 main_gui.cpp
+SOURCES		:= $(filter-out $(SRC)/main.cpp $(MOC_SOURCES), $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS))))
 
 # define the C object files
-OBJECTS		:= $(SOURCES:.cpp=.o)
+OBJECTS		:= $(SOURCES:.cpp=.o) $(MOC_SOURCES:.cpp=.o)
 
 # define the dependency output files
 DEPS		:= $(OBJECTS:.o=.d)
@@ -78,6 +99,15 @@ all: $(OUTPUT) $(MAIN)
 $(OUTPUT):
 	$(MD) $(OUTPUT)
 
+# MOC 规则：从 .h 文件生成 moc_*.cpp 文件
+$(SRC)/moc_%.cpp: $(INCLUDE)/%.h
+ifneq ($(MOC),)
+	$(MOC) $(QT_FLAGS) $(INCLUDES) $< -o $@
+else
+	@echo "Warning: MOC not found, skipping $@"
+	@touch $@
+endif
+
 $(MAIN): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(QT_FLAGS) -o $(OUTPUTMAIN) $(OBJECTS) $(LFLAGS) $(LIBS) $(QT_LIBS)
 
@@ -93,6 +123,7 @@ clean:
 	$(RM) $(OUTPUTMAIN)
 	$(RM) $(call FIXPATH,$(OBJECTS))
 	$(RM) $(call FIXPATH,$(DEPS))
+	$(RM) $(call FIXPATH,$(MOC_SOURCES))
 	@echo Cleanup complete!
 
 run: all
