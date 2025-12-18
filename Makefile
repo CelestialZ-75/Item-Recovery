@@ -96,5 +96,9 @@ clean:
 	@echo Cleanup complete!
 
 run: all
+ifeq ($(OS),Windows_NT)
+	$(OUTPUTMAIN)
+else
 	./$(OUTPUTMAIN)
+endif
 	@echo Executing 'run: all' complete!

@@ -13,9 +13,11 @@ class Interface {
     vector<Contacts> con_v;
 
   public:
+    Interface() {};  // 默认构造函数
     Interface(Inventory &_inv) : inv(_inv) {};
     void helloCommand();
     void entrySelect(char input);
+    ItemCategory selectCategory();  // 选择物品类别
 };
 
 #endif

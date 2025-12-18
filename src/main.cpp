@@ -6,10 +6,11 @@
 
 int main(int argc, char *argv[])
 {
+    (void)argc;  // 避免未使用参数警告
+    (void)argv;
+    
     char input = '0';
-    vector<Item> v;
-    Inventory e(v); 
-    Interface i(e);
+    Interface i;  // 使用默认构造函数
     
     while(input != 'e'){
         i.helloCommand();
@@ -17,4 +18,6 @@ int main(int argc, char *argv[])
     
         i.entrySelect(input);
     }
+    
+    return 0;
 }
