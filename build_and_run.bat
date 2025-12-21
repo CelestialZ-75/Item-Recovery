@@ -11,12 +11,16 @@ set QT_PATH=
 set COMPILER=MSVC
 
 REM 解析命令行参数
-if not "%~1"=="" set BUILD_TYPE=%~1
-if not "%~2"=="" set QT_PATH=%~2
+if not "%~1"=="" (
+    set BUILD_TYPE=%~1
+)
+if not "%~2"=="" (
+    set "QT_PATH=%~2"
+)
 
 REM 检查CMake是否安装
 where cmake >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] CMake not found. Please install CMake and add it to PATH
     echo Download: https://cmake.org/download/
     pause
@@ -49,6 +53,11 @@ if "%QT_PATH%"=="" (
 )
 
 REM 检查Qt路径是否有效
+if "%QT_PATH%"=="" (
+    echo [ERROR] Qt path is empty
+    pause
+    exit /b 1
+)
 if not exist "%QT_PATH%\bin\qmake.exe" (
     echo [ERROR] Invalid Qt path: %QT_PATH%
     echo Please ensure the path points to Qt installation directory (contains bin\qmake.exe)
@@ -78,23 +87,30 @@ REM 根据编译器选择生成器
 if "%COMPILER%"=="MSVC" (
     REM 检测Visual Studio版本
     where cl >nul 2>&1
-    if %errorlevel% neq 0 (
+    if errorlevel 1 (
         echo [WARNING] MSVC compiler not found, trying MinGW...
         set COMPILER=MinGW
         set GENERATOR=MinGW Makefiles
     ) else (
         REM 检测VS版本
-        for /f "tokens=*" %%i in ('where cl') do set CL_PATH=%%i
-        echo %CL_PATH% | findstr /i "2022" >nul
-        if %errorlevel% equ 0 (
-            set GENERATOR=Visual Studio 17 2022
-        ) else (
-            echo %CL_PATH% | findstr /i "2019" >nul
-            if %errorlevel% equ 0 (
-                set GENERATOR=Visual Studio 16 2019
+        set CL_PATH=
+        for /f "tokens=*" %%i in ('where cl 2^>nul') do (
+            set "CL_PATH=%%i"
+        )
+        if defined CL_PATH (
+            echo !CL_PATH! | findstr /i "2022" >nul
+            if errorlevel 1 (
+                echo !CL_PATH! | findstr /i "2019" >nul
+                if errorlevel 1 (
+                    set GENERATOR=Visual Studio 17 2022
+                ) else (
+                    set GENERATOR=Visual Studio 16 2019
+                )
             ) else (
                 set GENERATOR=Visual Studio 17 2022
             )
+        ) else (
+            set GENERATOR=Visual Studio 17 2022
         )
     )
 )
@@ -103,7 +119,7 @@ if "%COMPILER%"=="MinGW" (
     set GENERATOR=MinGW Makefiles
     REM 检查MinGW是否在PATH中
     where g++ >nul 2>&1
-    if %errorlevel% neq 0 (
+    if errorlevel 1 (
         echo [ERROR] MinGW compiler not found. Please add it to PATH
         pause
         exit /b 1
@@ -121,7 +137,7 @@ if "%COMPILER%"=="MSVC" (
     cmake .. -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%QT_PATH%"
 )
 
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] CMake configuration failed
     pause
     exit /b 1
@@ -138,7 +154,7 @@ if "%COMPILER%"=="MSVC" (
     cmake --build . --config Release
 )
 
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo [ERROR] Build failed
     pause
     exit /b 1
