@@ -10,12 +10,15 @@ set BUILD_TYPE=GUI
 set QT_PATH=
 set COMPILER=MSVC
 
-REM 解析命令行参数
-if not "%~1"=="" (
-    set BUILD_TYPE=%~1
+REM 解析命令行参数 - 使用更安全的方法
+set ARG1=%~1
+set ARG2=%~2
+
+if not "%ARG1%"=="" (
+    set BUILD_TYPE=%ARG1%
 )
-if not "%~2"=="" (
-    set "QT_PATH=%~2"
+if not "%ARG2%"=="" (
+    set QT_PATH=%ARG2%
 )
 
 REM 检查CMake是否安装
@@ -92,26 +95,9 @@ if "%COMPILER%"=="MSVC" (
         set COMPILER=MinGW
         set GENERATOR=MinGW Makefiles
     ) else (
-        REM 检测VS版本
-        set CL_PATH=
-        for /f "tokens=*" %%i in ('where cl 2^>nul') do (
-            set "CL_PATH=%%i"
-        )
-        if defined CL_PATH (
-            echo !CL_PATH! | findstr /i "2022" >nul
-            if errorlevel 1 (
-                echo !CL_PATH! | findstr /i "2019" >nul
-                if errorlevel 1 (
-                    set GENERATOR=Visual Studio 17 2022
-                ) else (
-                    set GENERATOR=Visual Studio 16 2019
-                )
-            ) else (
-                set GENERATOR=Visual Studio 17 2022
-            )
-        ) else (
-            set GENERATOR=Visual Studio 17 2022
-        )
+        REM 检测VS版本 - 简化版本检测
+        REM 默认使用VS 2022，如果需要可以手动指定
+        set GENERATOR=Visual Studio 17 2022
     )
 )
 
