@@ -19,6 +19,7 @@
 #include <QTabWidget>
 #include <QInputDialog>
 #include <QTextStream>
+#include <QCloseEvent>
 #include "inventory.h"
 #include "interface.h"
 #include "itemtype.h"
@@ -105,7 +106,7 @@ private:
 class AdminDialog : public QDialog {
     Q_OBJECT
 public:
-    AdminDialog(ItemTypeManager* manager, UserManager* userManager, QWidget *parent = nullptr);
+    AdminDialog(ItemTypeManager* manager, UserManager* userManager, Interface* interface, QWidget *parent = nullptr);
     
 private slots:
     void approveUsers();
@@ -118,6 +119,7 @@ private slots:
 private:
     ItemTypeManager* itemTypeManager;
     UserManager* userManager;
+    Interface* interface;
     QListWidget *typeListWidget;
     QListWidget *userListWidget;
     void refreshTypeList();
@@ -132,6 +134,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void showLoginDialog();

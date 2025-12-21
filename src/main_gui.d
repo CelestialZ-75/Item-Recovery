@@ -217,19 +217,34 @@ src/main_gui.o: src/main_gui.cpp include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QTabWidget \
   /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
   /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h \
-  /opt/homebrew/opt/qt/include/QtCore/QTextStream include/inventory.h \
-  include/item.h include/interface.h include/user.h include/itemtype.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QApplication \
-  /opt/homebrew/opt/qt/include/QtWidgets/qapplication.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/QTextStream \
+  /opt/homebrew/opt/qt/include/QtGui/QCloseEvent \
+  /opt/homebrew/opt/qt/include/QtGui/qevent.h \
   /opt/homebrew/opt/qt/include/QtCore/qcoreevent.h \
   /opt/homebrew/opt/qt/include/QtCore/qbasictimer.h \
   /opt/homebrew/opt/qt/include/QtCore/qabstracteventdispatcher.h \
   /opt/homebrew/opt/qt/include/QtCore/qeventloop.h \
   /opt/homebrew/opt/qt/include/QtCore/qdeadlinetimer.h \
   /opt/homebrew/opt/qt/include/QtCore/qelapsedtimer.h \
+  /opt/homebrew/opt/qt/include/QtGui/qeventpoint.h \
+  /opt/homebrew/opt/qt/include/QtGui/qvector2d.h \
+  /opt/homebrew/opt/qt/include/QtGui/qvectornd.h \
+  /opt/homebrew/opt/qt/include/QtGui/qpointingdevice.h \
+  /opt/homebrew/opt/qt/include/QtGui/qinputdevice.h \
+  /opt/homebrew/opt/qt/include/QtGui/qscreen.h \
+  /opt/homebrew/opt/qt/include/QtCore/QList \
+  /opt/homebrew/opt/qt/include/QtCore/QObject \
+  /opt/homebrew/opt/qt/include/QtCore/QRect \
+  /opt/homebrew/opt/qt/include/QtCore/QSize \
+  /opt/homebrew/opt/qt/include/QtCore/QSizeF \
+  /opt/homebrew/opt/qt/include/QtGui/QTransform \
   /opt/homebrew/opt/qt/include/QtCore/qnativeinterface.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
+  /opt/homebrew/opt/qt/include/QtGui/qscreen_platform.h \
   /opt/homebrew/opt/qt/include/QtGui/qguiapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
   /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
-  /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h
+  /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h \
+  include/inventory.h include/item.h include/interface.h include/user.h \
+  include/itemtype.h /opt/homebrew/opt/qt/include/QtWidgets/QApplication \
+  /opt/homebrew/opt/qt/include/QtWidgets/qapplication.h

@@ -218,6 +218,33 @@ src/moc_mainwindow.o: src/moc_mainwindow.cpp src/../include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
   /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h \
   /opt/homebrew/opt/qt/include/QtCore/QTextStream \
+  /opt/homebrew/opt/qt/include/QtGui/QCloseEvent \
+  /opt/homebrew/opt/qt/include/QtGui/qevent.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreevent.h \
+  /opt/homebrew/opt/qt/include/QtCore/qbasictimer.h \
+  /opt/homebrew/opt/qt/include/QtCore/qabstracteventdispatcher.h \
+  /opt/homebrew/opt/qt/include/QtCore/qeventloop.h \
+  /opt/homebrew/opt/qt/include/QtCore/qdeadlinetimer.h \
+  /opt/homebrew/opt/qt/include/QtCore/qelapsedtimer.h \
+  /opt/homebrew/opt/qt/include/QtGui/qeventpoint.h \
+  /opt/homebrew/opt/qt/include/QtGui/qvector2d.h \
+  /opt/homebrew/opt/qt/include/QtGui/qvectornd.h \
+  /opt/homebrew/opt/qt/include/QtGui/qpointingdevice.h \
+  /opt/homebrew/opt/qt/include/QtGui/qinputdevice.h \
+  /opt/homebrew/opt/qt/include/QtGui/qscreen.h \
+  /opt/homebrew/opt/qt/include/QtCore/QList \
+  /opt/homebrew/opt/qt/include/QtCore/QObject \
+  /opt/homebrew/opt/qt/include/QtCore/QRect \
+  /opt/homebrew/opt/qt/include/QtCore/QSize \
+  /opt/homebrew/opt/qt/include/QtCore/QSizeF \
+  /opt/homebrew/opt/qt/include/QtGui/QTransform \
+  /opt/homebrew/opt/qt/include/QtCore/qnativeinterface.h \
+  /opt/homebrew/opt/qt/include/QtGui/qscreen_platform.h \
+  /opt/homebrew/opt/qt/include/QtGui/qguiapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication.h \
+  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
+  /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
+  /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h \
   src/../include/inventory.h src/../include/item.h \
   src/../include/interface.h src/../include/user.h \
   src/../include/itemtype.h \

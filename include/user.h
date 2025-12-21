@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 // 用户类型枚举
@@ -84,6 +86,10 @@ class UserManager {
     
     // 获取所有用户
     vector<User>& getUsers() { return users; }
+    
+    // 数据持久化
+    bool saveToFile(const string& filename = "data/users.txt");
+    bool loadFromFile(const string& filename = "data/users.txt");
 };
 
 #endif

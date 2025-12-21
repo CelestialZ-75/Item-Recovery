@@ -1,13 +1,24 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "interface.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 bool isUnvalidN(string n) { return n == "NaN" || n.empty(); }
 
 bool isUnvalidD(string d) { return d == "NaD" || d.empty(); }
 
-Interface::Interface() : currentUser(nullptr) {}
+Interface::Interface() : currentUser(nullptr) {
+    // 加载所有数据
+    loadAllData();
+}
 
 bool Interface::login() {
     string username, password;
@@ -51,6 +62,7 @@ void Interface::registerUser() {
     
     if (userManager.registerUser(username, password, address, phone, email)) {
         cout << "注册成功！请等待管理员审批后即可登录使用。" << endl;
+        saveAllData();  // 保存数据
     } else {
         cout << "注册失败！用户名可能已存在。" << endl;
     }
@@ -131,6 +143,7 @@ void Interface::adminAddItemType() {
         cout << "物品类型添加成功！" << endl;
         // 添加属性
         char addAttr;
+        bool attrAdded = false;
         do {
             cout << "是否添加属性？(y/n): ";
             cin >> addAttr;
@@ -150,9 +163,14 @@ void Interface::adminAddItemType() {
                 
                 if (itemTypeManager.addAttributeToType(typeName, attrName, type)) {
                     cout << "属性添加成功！" << endl;
+                    attrAdded = true;
                 }
             }
         } while (addAttr == 'y' || addAttr == 'Y');
+        
+        if (attrAdded || addAttr != 'y') {
+            saveAllData();  // 保存数据
+        }
     } else {
         cout << "物品类型已存在！" << endl;
     }
@@ -195,6 +213,7 @@ void Interface::adminModifyItemType() {
         
         if (itemTypeManager.addAttributeToType(typeName, attrName, typeEnum)) {
             cout << "属性添加成功！" << endl;
+            saveAllData();  // 保存数据
         }
     } else if (choice == '2') {
         // 显示属性列表
@@ -228,6 +247,7 @@ void Interface::adminModifyItemType() {
             
             if (itemTypeManager.modifyAttributeInType(typeName, index, newName, typeEnum)) {
                 cout << "属性修改成功！" << endl;
+                saveAllData();  // 保存数据
             }
         } else {
             cout << "无效的序号！" << endl;
@@ -256,6 +276,7 @@ void Interface::adminApproveUsers() {
     if (username != "b") {
         if (userManager.approveUser(username)) {
             cout << "用户批准成功！" << endl;
+            saveAllData();  // 保存数据
         } else {
             cout << "批准失败！用户名不存在或已被批准。" << endl;
         }
@@ -287,6 +308,7 @@ void Interface::normalUserAddItem() {
     inv.addItem(newItem);
     
     cout << "物品添加成功！" << endl;
+    saveAllData();  // 保存数据
 }
 
 void Interface::normalUserSearchItem() {
@@ -334,10 +356,12 @@ void Interface::entrySelect(char input) {
                 cout << "请输入要删除的物品名称: ";
                 cin.ignore();
                 getline(cin, name);
-                if (inv.deleteItem(name))
+                if (inv.deleteItem(name)) {
                     cout << "删除成功！" << endl;
-                else
+                    saveAllData();  // 保存数据
+                } else {
                     cout << "删除失败！物品不存在。" << endl;
+                }
                 break;
             }
             case '3': {
@@ -380,10 +404,12 @@ void Interface::entrySelect(char input) {
                 cout << "请输入要删除的物品名称: ";
                 cin.ignore();
                 getline(cin, name);
-                if (inv.deleteItem(name))
+                if (inv.deleteItem(name)) {
                     cout << "删除成功！" << endl;
-                else
+                    saveAllData();  // 保存数据
+                } else {
                     cout << "删除失败！物品不存在。" << endl;
+                }
                 break;
             }
             case '3': {
@@ -422,4 +448,23 @@ ItemCategory Interface::selectCategory() {
         case 3: return ItemCategory::TOOL;
         default: return ItemCategory::OTHER;
     }
+}
+
+void Interface::saveAllData() {
+    // 确保data目录存在（如果目录已存在，mkdir会失败，但可以忽略）
+#ifdef _WIN32
+    CreateDirectoryA("data", NULL);
+#else
+    mkdir("data", 0755);  // 如果目录已存在，会返回-1，但我们可以忽略
+#endif
+    
+    // 保存所有数据
+    userManager.saveToFile();
+    inv.saveToFile();
+    itemTypeManager.saveToFile();
+}
+
+void Interface::loadAllData() {
+    // 加载物品数据（用户和物品类型数据已在各自管理器的构造函数中加载）
+    inv.loadFromFile();
 }

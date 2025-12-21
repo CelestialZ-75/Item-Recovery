@@ -81,3 +81,63 @@ vector<int> Inventory::searchByTypeAndKeyword(string typeName, string keyword) {
     }
     return results;
 }
+
+bool Inventory::saveToFile(const string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    for (auto* item : entry) {
+        if (item != nullptr) {
+            // 保存物品基本信息
+            file << item->getName() << "|"
+                 << item->getDescription() << "|"
+                 << item->getAddress() << "|"
+                 << item->getTypeName() << "|"
+                 << item->getContact().getName() << "|"
+                 << item->getContact().getNum() << "|"
+                 << item->getContact().getEmail() << "\n";
+        }
+    }
+    
+    file.close();
+    return true;
+}
+
+bool Inventory::loadFromFile(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        return false;  // 文件不存在或无法打开，返回false但不报错（首次运行）
+    }
+    
+    // 清空现有物品
+    for(auto* item : entry) {
+        delete item;
+    }
+    entry.clear();
+    
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        
+        stringstream ss(line);
+        string name, description, address, typeName, contactName, contactNum, contactEmail;
+        
+        if (getline(ss, name, '|') &&
+            getline(ss, description, '|') &&
+            getline(ss, address, '|') &&
+            getline(ss, typeName, '|') &&
+            getline(ss, contactName, '|') &&
+            getline(ss, contactNum, '|') &&
+            getline(ss, contactEmail, '|')) {
+            
+            Contacts con(contactName, contactNum, contactEmail);
+            Item* newItem = new Item(name, description, address, con, typeName);
+            entry.push_back(newItem);
+        }
+    }
+    
+    file.close();
+    return true;
+}

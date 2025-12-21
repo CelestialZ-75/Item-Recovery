@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 // 属性类型枚举
@@ -82,6 +84,10 @@ class ItemTypeManager {
     
     // 选择类型（用于界面交互）
     ItemType* selectType();
+    
+    // 数据持久化
+    bool saveToFile(const string& filename = "data/itemtypes.txt");
+    bool loadFromFile(const string& filename = "data/itemtypes.txt");
 };
 
 #endif

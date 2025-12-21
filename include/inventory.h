@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <fstream>
+#include <sstream>
 
 #include "item.h"
 
@@ -26,6 +28,10 @@ public:
     const vector<Item*>& getItems() const { return entry; }
     // 按类型和关键字搜索（关键字匹配物品名称和说明，以及联系人名称）
     vector<int> searchByTypeAndKeyword(string typeName, string keyword);
+    
+    // 数据持久化
+    bool saveToFile(const string& filename = "data/items.txt");
+    bool loadFromFile(const string& filename = "data/items.txt");
 };
 
 

@@ -46,6 +46,10 @@ class Interface {
     // 通用功能
     void entrySelect(char input);
     ItemCategory selectCategory();  // 选择物品类别（向后兼容）
+    
+    // 数据持久化
+    void saveAllData();  // 保存所有数据
+    void loadAllData();  // 加载所有数据
 };
 
 #endif

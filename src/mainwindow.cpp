@@ -232,8 +232,8 @@ ItemType* SearchDialog::getItemType() const {
 
 // ==================== AdminDialog 实现 ====================
 
-AdminDialog::AdminDialog(ItemTypeManager* manager, UserManager* userManager, QWidget *parent)
-    : QDialog(parent), itemTypeManager(manager), userManager(userManager)
+AdminDialog::AdminDialog(ItemTypeManager* manager, UserManager* userManager, Interface* interface, QWidget *parent)
+    : QDialog(parent), itemTypeManager(manager), userManager(userManager), interface(interface)
 {
     setWindowTitle("管理员功能");
     setMinimumSize(600, 500);
@@ -337,6 +337,7 @@ void AdminDialog::addItemType() {
         if (itemTypeManager->addItemType(typeName.toStdString())) {
             QMessageBox::information(this, "成功", "物品类型添加成功！");
             refreshTypeList();
+            if (interface) interface->saveAllData();  // 保存数据
         } else {
             QMessageBox::warning(this, "错误", "物品类型已存在！");
         }
@@ -374,6 +375,7 @@ void AdminDialog::addAttributeToType() {
                                                     attrName.toStdString(), attrType)) {
                 QMessageBox::information(this, "成功", "属性添加成功！");
                 refreshTypeList();
+                if (interface) interface->saveAllData();  // 保存数据
             } else {
                 QMessageBox::warning(this, "错误", "属性添加失败！");
             }
@@ -451,6 +453,7 @@ void AdminDialog::modifyAttributeInType() {
                                                newAttrName.toStdString(), attrType)) {
         QMessageBox::information(this, "成功", "属性修改成功！");
         refreshTypeList();
+        if (interface) interface->saveAllData();  // 保存数据
     } else {
         QMessageBox::warning(this, "错误", "属性修改失败！");
     }
@@ -507,6 +510,7 @@ void AdminDialog::deleteAttributeFromType() {
         if (type->removeAttribute(attrIndex)) {
             QMessageBox::information(this, "成功", "属性删除成功！");
             refreshTypeList();
+            if (interface) interface->saveAllData();  // 保存数据
         } else {
             QMessageBox::warning(this, "错误", "属性删除失败！");
         }
@@ -526,6 +530,7 @@ void AdminDialog::approveUsers() {
     if (userManager->approveUser(username.toStdString())) {
         QMessageBox::information(this, "成功", "用户批准成功！");
         refreshUserList();
+        if (interface) interface->saveAllData();  // 保存数据
     } else {
         QMessageBox::warning(this, "错误", "批准失败！用户可能不存在或已被批准。");
     }
@@ -652,6 +657,7 @@ void MainWindow::showLoginDialog() {
                     dialog.getPhone().toStdString(),
                     dialog.getEmail().toStdString())) {
                 QMessageBox::information(this, "成功", "注册成功！请等待管理员审批。");
+                interface.saveAllData();  // 保存数据
             } else {
                 QMessageBox::warning(this, "错误", "注册失败！用户名可能已存在。");
             }
@@ -722,6 +728,7 @@ void MainWindow::addItem()
         
         refreshItemList();
         QMessageBox::information(this, "成功", "物品添加成功！");
+        interface.saveAllData();  // 保存数据
     }
 }
 
@@ -743,6 +750,7 @@ void MainWindow::deleteItem()
         refreshItemList();
         detailsTextEdit->clear();
         QMessageBox::information(this, "成功", "物品删除成功！");
+        interface.saveAllData();  // 保存数据
     } else {
         QMessageBox::warning(this, "错误", "删除失败！物品不存在。");
     }
@@ -918,6 +926,12 @@ void MainWindow::showAdminDialog()
         return;
     }
     
-    AdminDialog dialog(&interface.getItemTypeManager(), &interface.getUserManager(), this);
+    AdminDialog dialog(&interface.getItemTypeManager(), &interface.getUserManager(), &interface, this);
     dialog.exec();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    interface.saveAllData();  // 关闭窗口前保存所有数据
+    event->accept();
 }

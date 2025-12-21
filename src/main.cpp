@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
                     i.registerUser();
                     break;
                 case 'e':
+                    i.saveAllData();  // 退出前保存所有数据
                     cout << "再见！" << endl;
                     return 0;
                 default:
