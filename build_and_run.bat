@@ -17,32 +17,32 @@ if not "%~2"=="" set QT_PATH=%~2
 REM 检查CMake是否安装
 where cmake >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [错误] 未找到CMake，请先安装CMake并添加到PATH
-    echo 下载地址: https://cmake.org/download/
+    echo [ERROR] CMake not found. Please install CMake and add it to PATH
+    echo Download: https://cmake.org/download/
     pause
     exit /b 1
 )
 
 REM 如果没有提供Qt路径，尝试自动检测
 if "%QT_PATH%"=="" (
-    echo [信息] 未指定Qt路径，尝试自动检测...
+    echo [INFO] Qt path not specified, attempting auto-detection...
     
     REM 检查常见Qt安装位置
     if exist "C:\Qt\5.15.2\msvc2019_64" (
         set QT_PATH=C:\Qt\5.15.2\msvc2019_64
         set COMPILER=MSVC
-        echo [信息] 找到Qt (MSVC): %QT_PATH%
+        echo [INFO] Found Qt (MSVC): %QT_PATH%
     ) else if exist "C:\Qt\5.15.2\mingw81_64" (
         set QT_PATH=C:\Qt\5.15.2\mingw81_64
         set COMPILER=MinGW
-        echo [信息] 找到Qt (MinGW): %QT_PATH%
+        echo [INFO] Found Qt (MinGW): %QT_PATH%
     ) else if exist "C:\Qt\5.14.2\msvc2019_64" (
         set QT_PATH=C:\Qt\5.14.2\msvc2019_64
         set COMPILER=MSVC
-        echo [信息] 找到Qt (MSVC): %QT_PATH%
+        echo [INFO] Found Qt (MSVC): %QT_PATH%
     ) else (
-        echo [错误] 未找到Qt安装，请手动指定Qt路径
-        echo 使用方法: build_and_run.bat %BUILD_TYPE% "C:\Qt\5.15.2\msvc2019_64"
+        echo [ERROR] Qt installation not found. Please specify Qt path manually
+        echo Usage: build_and_run.bat %BUILD_TYPE% "C:\Qt\5.15.2\msvc2019_64"
         pause
         exit /b 1
     )
@@ -50,25 +50,25 @@ if "%QT_PATH%"=="" (
 
 REM 检查Qt路径是否有效
 if not exist "%QT_PATH%\bin\qmake.exe" (
-    echo [错误] Qt路径无效: %QT_PATH%
-    echo 请确保路径指向Qt安装目录（包含bin\qmake.exe）
+    echo [ERROR] Invalid Qt path: %QT_PATH%
+    echo Please ensure the path points to Qt installation directory (contains bin\qmake.exe)
     pause
     exit /b 1
 )
 
 echo.
 echo ========================================
-echo ItemRecovery 构建脚本
+echo ItemRecovery Build Script
 echo ========================================
-echo 构建类型: %BUILD_TYPE%
-echo Qt路径: %QT_PATH%
-echo 编译器: %COMPILER%
+echo Build Type: %BUILD_TYPE%
+echo Qt Path: %QT_PATH%
+echo Compiler: %COMPILER%
 echo ========================================
 echo.
 
 REM 创建构建目录
 if not exist "build" (
-    echo [信息] 创建构建目录...
+    echo [INFO] Creating build directory...
     mkdir build
 )
 
@@ -79,7 +79,7 @@ if "%COMPILER%"=="MSVC" (
     REM 检测Visual Studio版本
     where cl >nul 2>&1
     if %errorlevel% neq 0 (
-        echo [警告] 未找到MSVC编译器，尝试使用MinGW...
+        echo [WARNING] MSVC compiler not found, trying MinGW...
         set COMPILER=MinGW
         set GENERATOR=MinGW Makefiles
     ) else (
@@ -104,17 +104,17 @@ if "%COMPILER%"=="MinGW" (
     REM 检查MinGW是否在PATH中
     where g++ >nul 2>&1
     if %errorlevel% neq 0 (
-        echo [错误] 未找到MinGW编译器，请添加到PATH
+        echo [ERROR] MinGW compiler not found. Please add it to PATH
         pause
         exit /b 1
     )
 )
 
-echo [信息] 使用生成器: %GENERATOR%
+echo [INFO] Using generator: %GENERATOR%
 echo.
 
 REM 配置CMake
-echo [步骤 1/4] 配置CMake...
+echo [Step 1/4] Configuring CMake...
 if "%COMPILER%"=="MSVC" (
     cmake .. -G "%GENERATOR%" -A x64 -DCMAKE_PREFIX_PATH="%QT_PATH%"
 ) else (
@@ -122,16 +122,16 @@ if "%COMPILER%"=="MSVC" (
 )
 
 if %errorlevel% neq 0 (
-    echo [错误] CMake配置失败
+    echo [ERROR] CMake configuration failed
     pause
     exit /b 1
 )
 
-echo [成功] CMake配置完成
+echo [SUCCESS] CMake configuration completed
 echo.
 
 REM 编译项目
-echo [步骤 2/4] 编译项目...
+echo [Step 2/4] Building project...
 if "%COMPILER%"=="MSVC" (
     cmake --build . --config Release
 ) else (
@@ -139,17 +139,17 @@ if "%COMPILER%"=="MSVC" (
 )
 
 if %errorlevel% neq 0 (
-    echo [错误] 编译失败
+    echo [ERROR] Build failed
     pause
     exit /b 1
 )
 
-echo [成功] 编译完成
+echo [SUCCESS] Build completed
 echo.
 
 REM 部署Qt库（仅GUI版本）
 if "%BUILD_TYPE%"=="GUI" (
-    echo [步骤 3/4] 部署Qt库...
+    echo [Step 3/4] Deploying Qt libraries...
     
     set WINDEPLOYQT=%QT_PATH%\bin\windeployqt.exe
     if exist "%WINDEPLOYQT%" (
@@ -158,16 +158,16 @@ if "%BUILD_TYPE%"=="GUI" (
         ) else (
             "%WINDEPLOYQT%" bin\Release\ItemRecovery_GUI.exe
         )
-        echo [成功] Qt库部署完成
+        echo [SUCCESS] Qt libraries deployed
     ) else (
-        echo [警告] 未找到windeployqt工具，可能需要手动部署Qt DLL
-        echo 请参考 WINDOWS_DEPLOYMENT.md 文档
+        echo [WARNING] windeployqt tool not found, may need to deploy Qt DLLs manually
+        echo Please refer to WINDOWS_DEPLOYMENT.md for details
     )
     echo.
 )
 
 REM 运行程序
-echo [步骤 4/4] 运行程序...
+echo [Step 4/4] Running program...
 echo.
 
 if "%BUILD_TYPE%"=="CLI" (
@@ -175,12 +175,12 @@ if "%BUILD_TYPE%"=="CLI" (
         if exist "bin\Release\ItemRecovery_CLI.exe" (
             cd bin\Release
             echo ========================================
-            echo 启动命令行版本...
+            echo Starting CLI version...
             echo ========================================
             echo.
             ItemRecovery_CLI.exe
         ) else (
-            echo [错误] 未找到可执行文件: bin\Release\ItemRecovery_CLI.exe
+            echo [ERROR] Executable not found: bin\Release\ItemRecovery_CLI.exe
             pause
             exit /b 1
         )
@@ -188,12 +188,12 @@ if "%BUILD_TYPE%"=="CLI" (
         if exist "bin\ItemRecovery_CLI.exe" (
             cd bin
             echo ========================================
-            echo 启动命令行版本...
+            echo Starting CLI version...
             echo ========================================
             echo.
             ItemRecovery_CLI.exe
         ) else (
-            echo [错误] 未找到可执行文件: bin\ItemRecovery_CLI.exe
+            echo [ERROR] Executable not found: bin\ItemRecovery_CLI.exe
             pause
             exit /b 1
         )
@@ -203,12 +203,12 @@ if "%BUILD_TYPE%"=="CLI" (
         if exist "bin\Release\ItemRecovery_GUI.exe" (
             cd bin\Release
             echo ========================================
-            echo 启动GUI版本...
+            echo Starting GUI version...
             echo ========================================
             echo.
             start ItemRecovery_GUI.exe
         ) else (
-            echo [错误] 未找到可执行文件: bin\Release\ItemRecovery_GUI.exe
+            echo [ERROR] Executable not found: bin\Release\ItemRecovery_GUI.exe
             pause
             exit /b 1
         )
@@ -216,12 +216,12 @@ if "%BUILD_TYPE%"=="CLI" (
         if exist "bin\ItemRecovery_GUI.exe" (
             cd bin
             echo ========================================
-            echo 启动GUI版本...
+            echo Starting GUI version...
             echo ========================================
             echo.
             start ItemRecovery_GUI.exe
         ) else (
-            echo [错误] 未找到可执行文件: bin\ItemRecovery_GUI.exe
+            echo [ERROR] Executable not found: bin\ItemRecovery_GUI.exe
             pause
             exit /b 1
         )
@@ -229,12 +229,12 @@ if "%BUILD_TYPE%"=="CLI" (
 )
 
 echo.
-echo [完成] 程序已启动
+echo [DONE] Program started
 echo.
-echo 提示: 如果程序无法运行，请检查:
-echo   1. Qt DLL是否正确部署
-echo   2. 数据目录是否存在
-echo   3. 参考 WINDOWS_DEPLOYMENT.md 获取更多帮助
+echo Tips: If the program fails to run, please check:
+echo   1. Qt DLLs are properly deployed
+echo   2. Data directory exists
+echo   3. Refer to WINDOWS_DEPLOYMENT.md for more help
 echo.
 
 pause
