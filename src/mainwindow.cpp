@@ -136,10 +136,10 @@ ItemType* ItemTypeDialog::getSelectedType() const {
 // ==================== AddItemDialog 实现 ====================
 
 AddItemDialog::AddItemDialog(ItemTypeManager* manager, User* currentUser, QWidget *parent)
-    : QDialog(parent), itemTypeManager(manager)
+    : QDialog(parent), itemTypeManager(manager), attributeWidget(nullptr), attributeLayout(nullptr)
 {
     setWindowTitle("添加物品");
-    setMinimumSize(400, 250);
+    setMinimumSize(400, 350);
     
     QVBoxLayout *layout = new QVBoxLayout(this);
     
@@ -161,7 +161,29 @@ AddItemDialog::AddItemDialog(ItemTypeManager* manager, User* currentUser, QWidge
         types.push_back(&type);
     }
     
+    // 连接类型选择变化信号
+    connect(typeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &AddItemDialog::onTypeChanged);
+    
     layout->addLayout(formLayout);
+    
+    // 创建属性输入区域
+    QLabel *attrLabel = new QLabel("类型属性:", this);
+    layout->addWidget(attrLabel);
+    
+    attributeWidget = new QWidget(this);
+    attributeLayout = new QVBoxLayout(attributeWidget);
+    attributeLayout->setContentsMargins(0, 0, 0, 0);
+    attributeWidget->setLayout(attributeLayout);
+    
+    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setWidget(attributeWidget);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setMaximumHeight(150);
+    layout->addWidget(scrollArea);
+    
+    // 初始化属性输入框
+    updateAttributeInputs();
     
     if (currentUser) {
         QLabel *contactLabel = new QLabel(
@@ -178,12 +200,78 @@ AddItemDialog::AddItemDialog(ItemTypeManager* manager, User* currentUser, QWidge
     layout->addWidget(buttonBox);
 }
 
+void AddItemDialog::onTypeChanged(int index) {
+    (void)index;  // 避免未使用参数警告
+    updateAttributeInputs();
+}
+
+void AddItemDialog::updateAttributeInputs() {
+    // 清除现有的属性输入框
+    for (QLineEdit* edit : attributeEdits) {
+        if (edit) {
+            attributeLayout->removeWidget(edit);
+            delete edit;
+        }
+    }
+    attributeEdits.clear();
+    attributeNames.clear();
+    
+    // 获取当前选择的类型
+    ItemType* selectedType = getItemType();
+    if (selectedType != nullptr) {
+        const vector<ItemTypeAttribute>& attrs = selectedType->getAttributes();
+        for (const auto& attr : attrs) {
+            QString attrName = QString::fromStdString(attr.getName());
+            attributeNames.push_back(attr.getName());
+            
+            QHBoxLayout *attrRowLayout = new QHBoxLayout();
+            QLabel *attrLabel = new QLabel(attrName + ":", attributeWidget);
+            QLineEdit *attrEdit = new QLineEdit(attributeWidget);
+            
+            // 根据属性类型设置输入验证
+            switch(attr.getType()) {
+                case AttributeType::INTEGER:
+                    attrEdit->setPlaceholderText("请输入整数");
+                    break;
+                case AttributeType::FLOAT:
+                    attrEdit->setPlaceholderText("请输入浮点数");
+                    break;
+                default:
+                    attrEdit->setPlaceholderText("请输入" + attrName);
+                    break;
+            }
+            
+            attrRowLayout->addWidget(attrLabel);
+            attrRowLayout->addWidget(attrEdit);
+            attributeLayout->addLayout(attrRowLayout);
+            attributeEdits.push_back(attrEdit);
+        }
+    }
+    
+    // 如果没有属性，显示提示
+    if (attributeEdits.empty()) {
+        QLabel *hintLabel = new QLabel("（该类型没有特殊属性）", attributeWidget);
+        attributeLayout->addWidget(hintLabel);
+    }
+}
+
 ItemType* AddItemDialog::getItemType() const {
     int index = typeComboBox->currentIndex();
     if (index >= 0 && static_cast<unsigned int>(index) < types.size()) {
         return types[index];
     }
     return nullptr;
+}
+
+map<string, string> AddItemDialog::getAttributeValues() const {
+    map<string, string> values;
+    for (size_t i = 0; i < attributeNames.size() && i < attributeEdits.size(); i++) {
+        QString value = attributeEdits[i]->text();
+        if (!value.isEmpty()) {
+            values[attributeNames[i]] = value.toStdString();
+        }
+    }
+    return values;
 }
 
 // ==================== SearchDialog 实现 ====================
@@ -724,6 +812,13 @@ void MainWindow::addItem()
         Contacts contact(currentUser->getUsername(), currentUser->getPhone(), currentUser->getEmail());
         Item* item = new Item(name.toStdString(), desc.toStdString(), 
                              addr.toStdString(), contact, type->getTypeName());
+        
+        // 设置属性值
+        map<string, string> attrValues = dialog.getAttributeValues();
+        for (const auto& pair : attrValues) {
+            item->setAttributeValue(pair.first, pair.second);
+        }
+        
         interface.getInventory().addItem(item);
         
         refreshItemList();
@@ -875,6 +970,7 @@ QString MainWindow::formatItemDetails(Item* item) {
             const vector<ItemTypeAttribute>& attrs = type->getAttributes();
             if (!attrs.empty()) {
                 stream << "\n类型属性:\n";
+                const map<string, string>& attrValues = item->getAttributeValues();
                 for (const auto& attr : attrs) {
                     QString attrTypeStr;
                     switch(attr.getType()) {
@@ -883,7 +979,16 @@ QString MainWindow::formatItemDetails(Item* item) {
                         case AttributeType::FLOAT: attrTypeStr = "浮点数"; break;
                     }
                     stream << "  - " << QString::fromStdString(attr.getName()) 
-                           << " (" << attrTypeStr << ")\n";
+                           << " (" << attrTypeStr << "): ";
+                    
+                    // 显示属性值
+                    auto it = attrValues.find(attr.getName());
+                    if (it != attrValues.end() && !it->second.empty()) {
+                        stream << QString::fromStdString(it->second);
+                    } else {
+                        stream << "（未设置）";
+                    }
+                    stream << "\n";
                 }
             }
         }

@@ -97,7 +97,16 @@ bool Inventory::saveToFile(const string& filename) {
                  << item->getTypeName() << "|"
                  << item->getContact().getName() << "|"
                  << item->getContact().getNum() << "|"
-                 << item->getContact().getEmail() << "\n";
+                 << item->getContact().getEmail();
+            
+            // 保存属性值
+            const map<string, string>& attrValues = item->getAttributeValues();
+            file << "|" << attrValues.size();
+            for (const auto& pair : attrValues) {
+                file << "|" << pair.first << ":" << pair.second;
+            }
+            
+            file << "\n";
         }
     }
     
@@ -134,6 +143,28 @@ bool Inventory::loadFromFile(const string& filename) {
             
             Contacts con(contactName, contactNum, contactEmail);
             Item* newItem = new Item(name, description, address, con, typeName);
+            
+            // 加载属性值
+            string attrCountStr;
+            if (getline(ss, attrCountStr, '|')) {
+                try {
+                    int attrCount = stoi(attrCountStr);
+                    for (int i = 0; i < attrCount; i++) {
+                        string attrPair;
+                        if (getline(ss, attrPair, '|')) {
+                            size_t colonPos = attrPair.find(':');
+                            if (colonPos != string::npos) {
+                                string attrName = attrPair.substr(0, colonPos);
+                                string attrValue = attrPair.substr(colonPos + 1);
+                                newItem->setAttributeValue(attrName, attrValue);
+                            }
+                        }
+                    }
+                } catch (...) {
+                    // 如果解析失败，忽略属性值（向后兼容）
+                }
+            }
+            
             entry.push_back(newItem);
         }
     }

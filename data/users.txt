@@ -1,2 +1,1 @@
 admin|admin123|ADMIN|APPROVED|管理员地址|00000000000|admin@example.com
-zhilin|123456|NORMAL|APPROVED|上海交通大学|13131313|123@sjtu.edu.cn

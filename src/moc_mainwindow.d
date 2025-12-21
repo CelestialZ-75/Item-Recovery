@@ -245,6 +245,8 @@ src/moc_mainwindow.o: src/moc_mainwindow.cpp src/../include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
   /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
   /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h \
+  /opt/homebrew/opt/qt/include/QtWidgets/QScrollArea \
+  /opt/homebrew/opt/qt/include/QtWidgets/qscrollarea.h \
   src/../include/inventory.h src/../include/item.h \
   src/../include/interface.h src/../include/user.h \
   src/../include/itemtype.h \

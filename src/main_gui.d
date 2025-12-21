@@ -245,6 +245,8 @@ src/main_gui.o: src/main_gui.cpp include/mainwindow.h \
   /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
   /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
   /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h \
+  /opt/homebrew/opt/qt/include/QtWidgets/QScrollArea \
+  /opt/homebrew/opt/qt/include/QtWidgets/qscrollarea.h \
   include/inventory.h include/item.h include/interface.h include/user.h \
   include/itemtype.h /opt/homebrew/opt/qt/include/QtWidgets/QApplication \
   /opt/homebrew/opt/qt/include/QtWidgets/qapplication.h

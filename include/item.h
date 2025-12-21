@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 using namespace std;
 
 // 物品类别枚举
@@ -40,6 +41,7 @@ class Item {
     Contacts con;          // 联系人信息
     ItemCategory category; // 物品类别（保留用于向后兼容）
     string typeName;       // 物品类型名称（动态类型）
+    map<string, string> attributeValues;  // 存储类型属性的值
 
   public:
     Item(string _name, string _de, string _addr, Contacts &_con, ItemCategory _cat)
@@ -58,6 +60,14 @@ class Item {
     string getTypeName() { return typeName; }
     void setTypeName(string _typeName) { typeName = _typeName; }
     Contacts& getContact() { return con; }
+    // 属性值管理
+    void setAttributeValue(string attrName, string value) { attributeValues[attrName] = value; }
+    string getAttributeValue(string attrName) const {
+        auto it = attributeValues.find(attrName);
+        return (it != attributeValues.end()) ? it->second : "";
+    }
+    const map<string, string>& getAttributeValues() const { return attributeValues; }
+    void clearAttributeValues() { attributeValues.clear(); }
 };
 
 // 食品类

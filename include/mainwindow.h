@@ -20,6 +20,10 @@
 #include <QInputDialog>
 #include <QTextStream>
 #include <QCloseEvent>
+#include <QScrollArea>
+#include <map>
+#include <string>
+#include <vector>
 #include "inventory.h"
 #include "interface.h"
 #include "itemtype.h"
@@ -77,12 +81,21 @@ public:
     QString getDescription() const { return descEdit->text(); }
     QString getAddress() const { return addressEdit->text(); }
     ItemType* getItemType() const;
+    map<string, string> getAttributeValues() const;
+    
+private slots:
+    void onTypeChanged(int index);
     
 private:
+    void updateAttributeInputs();
     QLineEdit *nameEdit;
     QLineEdit *descEdit;
     QLineEdit *addressEdit;
     QComboBox *typeComboBox;
+    QWidget *attributeWidget;
+    QVBoxLayout *attributeLayout;
+    vector<QLineEdit*> attributeEdits;
+    vector<string> attributeNames;
     ItemTypeManager* itemTypeManager;
     vector<ItemType*> types;
 };
