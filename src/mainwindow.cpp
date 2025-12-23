@@ -4,6 +4,10 @@
 #include <cctype>
 #include <algorithm>
 
+// FIX: Move Windows headers to the very top if needed, though usually mainwindow.h handles Qt includes which are safe.
+// If you encounter byte errors again, ensure windows.h is not included before Qt headers or handle UNICODE/byte properly.
+// The previous fix in interface.cpp handled the byte conflict.
+
 // ==================== LoginDialog 实现 ====================
 
 LoginDialog::LoginDialog(QWidget *parent)
@@ -135,8 +139,9 @@ ItemType* ItemTypeDialog::getSelectedType() const {
 
 // ==================== AddItemDialog 实现 ====================
 
+// 修复初始化顺序警告：attributeWidget 和 attributeLayout 在头文件中声明在 itemTypeManager 之前
 AddItemDialog::AddItemDialog(ItemTypeManager* manager, User* currentUser, QWidget *parent)
-    : QDialog(parent), itemTypeManager(manager), attributeWidget(nullptr), attributeLayout(nullptr)
+    : QDialog(parent), attributeWidget(nullptr), attributeLayout(nullptr), itemTypeManager(manager)
 {
     setWindowTitle("添加物品");
     setMinimumSize(400, 350);

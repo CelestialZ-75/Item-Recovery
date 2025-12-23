@@ -69,21 +69,45 @@ REM Auto-detect Qt if not provided
 if "%QT_PATH%"=="" (
     echo [DEBUG] Qt path not specified, attempting auto-detection...
     
+    REM 检查常见Qt安装位置（按优先级排序）
     if exist "C:\Qt\5.15.2\msvc2019_64" (
         set QT_PATH=C:\Qt\5.15.2\msvc2019_64
+        set COMPILER=MSVC
+        echo [DEBUG] Found Qt (MSVC): %QT_PATH%
+    ) else if exist "C:\Qt\5.15.2\msvc2022_64" (
+        set QT_PATH=C:\Qt\5.15.2\msvc2022_64
+        set COMPILER=MSVC
+        echo [DEBUG] Found Qt (MSVC): %QT_PATH%
+    ) else if exist "C:\Qt\6.5.0\msvc2019_64" (
+        set QT_PATH=C:\Qt\6.5.0\msvc2019_64
+        set COMPILER=MSVC
+        echo [DEBUG] Found Qt (MSVC): %QT_PATH%
+    ) else if exist "C:\Qt\6.5.0\msvc2022_64" (
+        set QT_PATH=C:\Qt\6.5.0\msvc2022_64
+        set COMPILER=MSVC
+        echo [DEBUG] Found Qt (MSVC): %QT_PATH%
+    ) else if exist "C:\Qt\5.14.2\msvc2019_64" (
+        set QT_PATH=C:\Qt\5.14.2\msvc2019_64
         set COMPILER=MSVC
         echo [DEBUG] Found Qt (MSVC): %QT_PATH%
     ) else if exist "C:\Qt\5.15.2\mingw81_64" (
         set QT_PATH=C:\Qt\5.15.2\mingw81_64
         set COMPILER=MinGW
         echo [DEBUG] Found Qt (MinGW): %QT_PATH%
-    ) else if exist "C:\Qt\5.14.2\msvc2019_64" (
-        set QT_PATH=C:\Qt\5.14.2\msvc2019_64
-        set COMPILER=MSVC
-        echo [DEBUG] Found Qt (MSVC): %QT_PATH%
+    ) else if exist "C:\Qt\6.5.0\mingw_64" (
+        set QT_PATH=C:\Qt\6.5.0\mingw_64
+        set COMPILER=MinGW
+        echo [DEBUG] Found Qt (MinGW): %QT_PATH%
     ) else (
         echo [ERROR] Qt installation not found. Please specify Qt path manually
+        echo.
         echo Usage: build_and_run_debug.bat [DEBUG] [CLI^|GUI] "C:\Qt\5.15.2\msvc2019_64"
+        echo.
+        echo Common Qt installation paths:
+        echo   - C:\Qt\5.15.2\msvc2019_64
+        echo   - C:\Qt\5.15.2\mingw81_64
+        echo   - C:\Qt\6.5.0\msvc2022_64
+        echo.
         pause
         exit /b 1
     )
@@ -143,13 +167,50 @@ if "%COMPILER%"=="MSVC" (
     echo [DEBUG] Detecting Visual Studio version...
     where cl >nul 2>&1
     if errorlevel 1 (
-        echo [WARNING] MSVC compiler not found, trying MinGW...
-        set COMPILER=MinGW
-        set GENERATOR=MinGW Makefiles
+        echo [WARNING] MSVC compiler not found in PATH
+        echo [DEBUG] Attempting to setup MSVC environment...
+        
+        REM 尝试查找并运行vcvarsall.bat
+        set VS_FOUND=0
+        if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+            echo [DEBUG] Found VS 2022 Community, setting up environment...
+            call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+            set VS_FOUND=1
+            set GENERATOR=Visual Studio 17 2022
+        ) else if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+            echo [DEBUG] Found VS 2022 Professional, setting up environment...
+            call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+            set VS_FOUND=1
+            set GENERATOR=Visual Studio 17 2022
+        ) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" (
+            echo [DEBUG] Found VS 2019 Community, setting up environment...
+            call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+            set VS_FOUND=1
+            set GENERATOR=Visual Studio 16 2019
+        ) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat" (
+            echo [DEBUG] Found VS 2019 Professional, setting up environment...
+            call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+            set VS_FOUND=1
+            set GENERATOR=Visual Studio 16 2019
+        )
+        
+        if !VS_FOUND!==0 (
+            echo [WARNING] Could not setup MSVC environment, trying MinGW...
+            set COMPILER=MinGW
+            set GENERATOR=MinGW Makefiles
+        ) else (
+            echo [DEBUG] MSVC environment setup successful
+        )
     ) else (
         echo [DEBUG] MSVC compiler found, detecting version...
-        REM Simplified version detection
-        set GENERATOR=Visual Studio 17 2022
+        if exist "C:\Program Files\Microsoft Visual Studio\2022" (
+            set GENERATOR=Visual Studio 17 2022
+        ) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019" (
+            set GENERATOR=Visual Studio 16 2019
+        ) else (
+            set GENERATOR=Visual Studio 17 2022
+        )
+        echo [DEBUG] Using generator: %GENERATOR%
     )
 )
 
@@ -160,6 +221,7 @@ if "%COMPILER%"=="MinGW" (
     where g++ >nul 2>&1
     if errorlevel 1 (
         echo [ERROR] MinGW compiler not found. Please add it to PATH
+        echo Or run this script from Visual Studio Developer Command Prompt
         pause
         exit /b 1
     )
@@ -210,14 +272,36 @@ echo.
 REM Deploy Qt libraries (GUI only)
 if "%BUILD_TYPE%"=="GUI" (
     echo [Step 3/4] Deploying Qt libraries...
-    set WINDEPLOYQT=%QT_PATH%\bin\windeployqt.exe
-    if exist "%WINDEPLOYQT%" (
-        echo [DEBUG] Running windeployqt...
-        "%WINDEPLOYQT%" bin\Release\ItemRecovery_GUI.exe
-        echo [SUCCESS] Qt libraries deployed
+    
+    REM 确定可执行文件路径
+    set EXE_PATH=
+    if "%COMPILER%"=="MSVC" (
+        set EXE_PATH=bin\Release\ItemRecovery_GUI.exe
+        if not exist "!EXE_PATH!" (
+            set EXE_PATH=bin\Debug\ItemRecovery_GUI.exe
+        )
     ) else (
-        echo [WARNING] windeployqt tool not found
-        echo Please refer to WINDOWS_DEPLOYMENT.md for details
+        set EXE_PATH=bin\ItemRecovery_GUI.exe
+    )
+    
+    echo [DEBUG] Looking for executable: !EXE_PATH!
+    if exist "!EXE_PATH!" (
+        set WINDEPLOYQT=%QT_PATH%\bin\windeployqt.exe
+        echo [DEBUG] windeployqt path: %WINDEPLOYQT%
+        if exist "%WINDEPLOYQT%" (
+            echo [DEBUG] Running windeployqt for: !EXE_PATH!
+            "%WINDEPLOYQT%" "!EXE_PATH!"
+            if errorlevel 1 (
+                echo [WARNING] windeployqt failed, but continuing...
+            ) else (
+                echo [SUCCESS] Qt libraries deployed
+            )
+        ) else (
+            echo [WARNING] windeployqt tool not found at: %WINDEPLOYQT%
+            echo Please refer to WINDOWS_DEPLOYMENT.md for details
+        )
+    ) else (
+        echo [WARNING] Executable not found for deployment: !EXE_PATH!
     )
     echo.
 )
@@ -226,37 +310,77 @@ REM Run program
 echo [Step 4/4] Running program...
 echo.
 
-set EXE_PATH=
+REM 确定可执行文件路径和名称
+set EXE_NAME=
+set EXE_DIR=
 if "%BUILD_TYPE%"=="CLI" (
-    if "%COMPILER%"=="MSVC" (
-        set EXE_PATH=bin\Release\ItemRecovery_CLI.exe
+    set EXE_NAME=ItemRecovery_CLI.exe
+) else (
+    set EXE_NAME=ItemRecovery_GUI.exe
+)
+
+REM 根据编译器确定路径
+if "%COMPILER%"=="MSVC" (
+    REM MSVC使用多配置生成器，先尝试Release，再尝试Debug
+    if exist "bin\Release\%EXE_NAME%" (
+        set EXE_DIR=bin\Release
+    ) else if exist "bin\Debug\%EXE_NAME%" (
+        set EXE_DIR=bin\Debug
     ) else (
-        set EXE_PATH=bin\ItemRecovery_CLI.exe
+        echo [ERROR] Executable not found in bin\Release\ or bin\Debug\
+        echo [DEBUG] Current directory: %CD%
+        echo [DEBUG] Searching for executable...
+        dir /s /b %EXE_NAME% 2>nul
+        echo [DEBUG] Available files in bin:
+        if exist "bin" dir /b /s bin 2>nul
+        pause
+        exit /b 1
     )
 ) else (
-    if "%COMPILER%"=="MSVC" (
-        set EXE_PATH=bin\Release\ItemRecovery_GUI.exe
+    REM MinGW使用单配置生成器
+    if exist "bin\%EXE_NAME%" (
+        set EXE_DIR=bin
     ) else (
-        set EXE_PATH=bin\ItemRecovery_GUI.exe
+        echo [ERROR] Executable not found: bin\%EXE_NAME%
+        echo [DEBUG] Current directory: %CD%
+        echo [DEBUG] Searching for executable...
+        dir /s /b %EXE_NAME% 2>nul
+        echo [DEBUG] Available files in bin:
+        if exist "bin" dir /b /s bin 2>nul
+        pause
+        exit /b 1
     )
 )
 
-echo [DEBUG] Looking for executable: %EXE_PATH%
-if exist "%EXE_PATH%" (
-    echo [DEBUG] Executable found, starting...
-    if "%BUILD_TYPE%"=="CLI" (
-        for %%F in ("%EXE_PATH%") do cd /d "%%~dpF"
-        "%EXE_PATH%"
-    ) else (
-        start "" "%EXE_PATH%"
-    )
-) else (
-    echo [ERROR] Executable not found: %EXE_PATH%
-    echo [DEBUG] Current directory: %CD%
-    dir /b bin 2>nul
-    dir /b bin\Release 2>nul
+echo [DEBUG] Executable directory: %EXE_DIR%
+echo [DEBUG] Executable name: %EXE_NAME%
+
+REM 切换到可执行文件目录并运行
+cd /d "%EXE_DIR%"
+if errorlevel 1 (
+    echo [ERROR] Failed to change to directory: %EXE_DIR%
     pause
     exit /b 1
+)
+
+echo ========================================
+if "%BUILD_TYPE%"=="CLI" (
+    echo Starting CLI version...
+) else (
+    echo Starting GUI version...
+)
+echo ========================================
+echo Executable: %CD%\%EXE_NAME%
+echo ========================================
+echo.
+
+if "%BUILD_TYPE%"=="CLI" (
+    echo [DEBUG] Running CLI executable...
+    %EXE_NAME%
+) else (
+    echo [DEBUG] Starting GUI executable in new window...
+    start "" "%EXE_NAME%"
+    echo [INFO] GUI application started in new window
 )
 
 echo.

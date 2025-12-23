@@ -1,3 +1,11 @@
+// FIX: Move Windows headers to the very top to avoid conflict between std::byte (C++17) and RPC byte
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <algorithm>
