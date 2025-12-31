@@ -4,7 +4,7 @@
 
 ## 1.1 项目背景
 
-针对大学生群体开发的闲置物品交易平台，解决学生宿舍空间有限、物品处置困难的问题，支持物品赠送和售卖功能。
+针对大学生群体开发的闲置物品交易平台，解决学生宿舍空间有限、物品处置困难的问题。
 
 ## 1.2 设计目标
 
@@ -412,3 +412,22 @@ make run
    - 物品说明
    - 联系人名称（物品发布者的用户名）
 4. 匹配是不区分大小写的
+
+# 8 UML图
+
+所有图源在/doc/out目录下
+
+## 8.1 用例图
+
+![alt text](doc/out/Use_Cases.png)
+
+## 8.2 顺序图
+
+![alt text](doc/out/login.png)
+![alt text](doc/out/add_Item.png)
+![alt text](doc/out/admin_Add.png)
+![alt text](doc/out/Search_Item.png)
+
+## 8.3 类图
+
+![alt text](doc/out/class_Diagram.png)
