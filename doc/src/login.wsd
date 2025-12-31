@@ -1,0 +1,56 @@
+@startuml login
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "User" as User
+participant "MainWindow" as Main
+participant "LoginDialog" as Dialog
+participant "Interface" as IF
+participant "UserManager" as UM
+participant "User Object" as UObj
+
+User -> Main: 点击 "登录/注册"
+activate Main
+
+Main -> Dialog: 创建并显示()
+activate Dialog
+User -> Dialog: 输入用户名/密码
+User -> Dialog: 点击确定
+Dialog --> Main: 返回 Accepted
+deactivate Dialog
+
+Main -> IF: getUserManager()
+activate IF
+IF --> Main: 返回 UserManager引用
+deactivate IF
+
+Main -> UM: login(username, password)
+activate UM
+UM -> UM: findUser(username)
+alt 用户存在且密码正确
+    UM --> Main: 返回 User指针
+else 验证失败
+    UM --> Main: 返回 nullptr
+end
+deactivate UM
+
+alt User != nullptr
+    Main -> UObj: isApproved()
+    activate UObj
+    UObj --> Main: 返回 bool
+    deactivate UObj
+    
+    alt isApproved == true
+        Main -> Main: updateUIForUser()\n(启用功能按钮)
+        Main -> Main: refreshItemList()
+        Main --> User: 显示登录成功消息
+    else 待审批
+        Main --> User: 显示"等待审批"警告
+        Main -> Main: 重置 currentUser = nullptr
+    end
+else User == nullptr
+    Main --> User: 显示错误消息
+end
+
+deactivate Main
+@enduml

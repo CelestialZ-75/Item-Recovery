@@ -1,0 +1,236 @@
+@startuml class_Diagram
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Data Models" {
+    enum ItemCategory {
+        FOOD
+        BOOK
+        TOOL
+        OTHER
+    }
+
+    enum AttributeType {
+        STRING
+        INTEGER
+        FLOAT
+    }
+
+    class Contacts {
+        - string name
+        - string num
+        - string email
+        + Contacts(string name, string num, string email)
+        + getName() : string
+        + getNum() : string
+        + getEmail() : string
+        + printContact()
+    }
+
+    class Item {
+        # string name
+        # string description
+        # string address
+        # Contacts con
+        # ItemCategory category
+        # string typeName
+        # map<string, string> attributeValues
+        + Item(...)
+        + ~Item()
+        + printItem()
+        + getName() : string
+        + getAttributeValue(string attrName) : string
+        + setAttributeValue(string attrName, string value)
+        + getContact() : Contacts&
+    }
+
+    class FoodItem {
+        - string expiryDate
+        - int quantity
+        + setExpiryDate(string)
+        + setQuantity(int)
+    }
+
+    class BookItem {
+        - string author
+        - string publisher
+        + setAuthor(string)
+        + setPublisher(string)
+    }
+
+    class ToolItem {
+        - string condition
+        + setCondition(string)
+    }
+
+    class OtherItem {
+    }
+
+    class ItemTypeAttribute {
+        - string name
+        - AttributeType type
+        + getName() : string
+        + getType() : AttributeType
+    }
+
+    class ItemType {
+        - string typeName
+        - vector<ItemTypeAttribute> attributes
+        + addAttribute(string, AttributeType)
+        + modifyAttribute(...)
+        + removeAttribute(int)
+        + getAttributes() : vector<ItemTypeAttribute>&
+    }
+
+    enum UserType {
+        ADMIN
+        NORMAL
+    }
+
+    enum UserStatus {
+        PENDING
+        APPROVED
+    }
+
+    class User {
+        - string username
+        - string password
+        - UserType userType
+        - UserStatus status
+        - string address
+        - string phone
+        - string email
+        + isAdmin() : bool
+        + isApproved() : bool
+        + approve()
+    }
+}
+
+package "Logic & Management" {
+    class Inventory {
+        - vector<Item*> entry
+        + ~Inventory()
+        + addItem(Item*)
+        + deleteItem(string) : bool
+        + findItem(string) : uint
+        + searchByTypeAndKeyword(...) : vector<int>
+        + saveToFile()
+        + loadFromFile()
+    }
+
+    class ItemTypeManager {
+        - vector<ItemType> itemTypes
+        + addItemType(string)
+        + addAttributeToType(...)
+        + modifyAttributeInType(...)
+        + findItemType(string) : ItemType*
+        + saveToFile()
+        + loadFromFile()
+    }
+
+    class UserManager {
+        - vector<User> users
+        + registerUser(...)
+        + login(string, string) : User*
+        + approveUser(string) : bool
+        + getPendingUsers() : vector<User*>
+        + saveToFile()
+        + loadFromFile()
+    }
+
+    class Interface {
+        - Inventory inv
+        - UserManager userManager
+        - ItemTypeManager itemTypeManager
+        - vector<Contacts> con_v
+        + User* currentUser
+        + login() : bool
+        + registerUser()
+        + adminManageItemTypes()
+        + normalUserAddItem()
+        + saveAllData()
+        + getInventory() : Inventory&
+        + getUserManager() : UserManager&
+        + getItemTypeManager() : ItemTypeManager&
+    }
+}
+
+package "GUI Presentation" {
+    class MainWindow {
+        - Interface interface
+        - User* currentUser
+        - QListWidget* itemListWidget
+        - QTextBrowser* detailsTextEdit
+        + showLoginDialog()
+        + addItem()
+        + deleteItem()
+        + searchItem()
+        + showAdminDialog()
+        + displayItemDetails(...)
+    }
+
+    class LoginDialog {
+        + getUsername()
+        + getPassword()
+        + isRegisterMode()
+    }
+
+    class AddItemDialog {
+        + getName()
+        + getItemType()
+        + getAttributeValues()
+    }
+
+    class SearchDialog {
+        + getKeyword()
+        + getItemType()
+    }
+
+    class AdminDialog {
+        - ItemTypeManager* itemTypeManager
+        - UserManager* userManager
+    }
+}
+
+' --- Relationships ---
+
+' Inheritance
+Item <|-- FoodItem
+Item <|-- BookItem
+Item <|-- ToolItem
+Item <|-- OtherItem
+
+' Composition & Aggregation
+Item *-- Contacts
+Item o-- ItemCategory
+ItemType *-- ItemTypeAttribute
+ItemTypeAttribute o-- AttributeType
+User o-- UserType
+User o-- UserStatus
+
+' Management composition
+Inventory o-- Item : manages >
+ItemTypeManager *-- ItemType : manages >
+UserManager *-- User : manages >
+
+' Interface Composition
+Interface *-- Inventory
+Interface *-- UserManager
+Interface *-- ItemTypeManager
+Interface o-- User : currentUser
+
+' GUI Association
+MainWindow *-- Interface
+MainWindow o-- User : currentUser
+MainWindow ..> LoginDialog : creates
+MainWindow ..> AddItemDialog : creates
+MainWindow ..> SearchDialog : creates
+MainWindow ..> AdminDialog : creates
+
+' Dialog Dependencies
+AddItemDialog ..> ItemTypeManager
+SearchDialog ..> ItemTypeManager
+AdminDialog ..> ItemTypeManager
+AdminDialog ..> UserManager
+
+@enduml

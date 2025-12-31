@@ -1,0 +1,71 @@
+@startuml Use_Cases
+left to right direction
+skinparam packageStyle rectangle
+
+' 定义角色
+actor "未登录访客" as Guest
+actor "普通用户" as NormalUser
+actor "管理员" as Admin
+
+' 继承关系：管理员拥有普通用户的所有权限
+NormalUser <|-- Admin
+
+package "物品复活系统 (Item Recovery System)" {
+
+    ' --- 认证与账户 ---
+    usecase "注册" as UC_Register
+    usecase "登录" as UC_Login
+    usecase "退出登录" as UC_Logout
+
+    ' --- 物品基础操作 ---
+    usecase "查看物品列表" as UC_ViewList
+    usecase "查看物品详情" as UC_ViewDetail
+    usecase "添加物品" as UC_Add
+    usecase "删除物品" as UC_Delete
+    usecase "搜索物品" as UC_Search
+
+    ' --- 管理员特权操作 ---
+    usecase "审批用户注册" as UC_ApproveUser
+    usecase "管理物品类型" as UC_ManageTypes
+    usecase "添加新类型" as UC_AddType
+    usecase "修改/添加类型属性" as UC_EditAttr
+
+    ' 关系定义
+    Guest --> UC_Register
+    Guest --> UC_Login
+
+    NormalUser --> UC_Logout
+    NormalUser --> UC_ViewList
+    NormalUser --> UC_ViewDetail
+    NormalUser --> UC_Add
+    NormalUser --> UC_Delete
+    NormalUser --> UC_Search
+
+    Admin --> UC_ApproveUser
+    Admin --> UC_ManageTypes
+
+    ' 包含与扩展关系
+    UC_ManageTypes ..> UC_AddType : <<include>>
+    UC_ManageTypes ..> UC_EditAttr : <<include>>
+    
+    ' 搜索通常包含查看列表或详情的前置动作
+    UC_Search ..> UC_ViewList : <<extends>>
+    
+    ' 添加物品包含选择类型
+    usecase "选择物品类型" as UC_SelectType
+    UC_Add ..> UC_SelectType : <<include>>
+
+    ' 登录是大部分操作的前置条件（在逻辑上）
+    ' 这里为了图表简洁，仅示意核心业务流
+    note right of UC_Login
+      普通用户需管理员
+      审批后方可登录
+    end note
+
+    note right of UC_ManageTypes
+      支持动态定义属性
+      (字符串/整数/浮点数)
+    end note
+}
+
+@enduml

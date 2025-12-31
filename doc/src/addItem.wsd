@@ -1,0 +1,49 @@
+@startuml add_Item
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "User" as User
+participant "MainWindow" as Main
+participant "AddItemDialog" as Dialog
+participant "ItemTypeManager" as ITM
+participant "Inventory" as Inv
+participant "Item" as NewItem
+
+User -> Main: 点击 "添加物品"
+activate Main
+
+Main -> ITM: 获取所有物品类型
+activate ITM
+ITM --> Main: vector<ItemType>
+deactivate ITM
+
+Main -> Dialog: 创建(ItemTypeManager, CurrentUser)
+activate Dialog
+Dialog -> Dialog: 生成属性输入框\n(根据选定类型的属性定义)
+
+User -> Dialog: 选择类型, 填写基本信息
+User -> Dialog: 填写类型特定属性(如保质期)
+User -> Dialog: 点击确定
+Dialog --> Main: 返回 Accepted
+deactivate Dialog
+
+Main -> Dialog: getName(), getAddress()...
+Main -> Dialog: getAttributeValues()
+
+create NewItem
+Main -> NewItem: new Item(name, desc, type...)
+activate NewItem
+Main -> NewItem: setAttributeValue(...)
+deactivate NewItem
+
+Main -> Inv: addItem(newItem)
+activate Inv
+Inv -> Inv: push_back(newItem)
+deactivate Inv
+
+Main -> Main: refreshItemList()
+Main -> Main: saveAllData() (持久化)
+Main --> User: 显示成功消息
+
+deactivate Main
+@enduml

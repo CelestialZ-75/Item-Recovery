@@ -1,0 +1,48 @@
+@startuml admin_Add
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "Admin" as Admin
+participant "MainWindow" as Main
+participant "AdminDialog" as Dialog
+participant "ItemTypeManager" as ITM
+
+Admin -> Main: 点击 "管理员功能"
+activate Main
+Main -> Dialog: 创建并显示()
+activate Dialog
+
+Admin -> Dialog: 点击 "添加类型"
+Dialog --> Admin: 弹出输入框(类型名称)
+Admin -> Dialog: 输入 "电子产品"
+
+Dialog -> ITM: addItemType("电子产品")
+activate ITM
+ITM -> ITM: 检查是否存在
+ITM --> Dialog: 返回 true
+deactivate ITM
+
+Dialog -> Dialog: refreshTypeList()
+
+Admin -> Dialog: 选中"电子产品", 点击 "添加属性"
+Dialog --> Admin: 弹出输入框(属性名)
+Admin -> Dialog: 输入 "电压"
+Dialog --> Admin: 弹出选择框(数据类型)
+Admin -> Dialog: 选择 "FLOAT"
+
+Dialog -> ITM: addAttributeToType("电子产品", "电压", FLOAT)
+activate ITM
+ITM -> ITM: 查找类型
+ITM -> ITM: addAttribute()
+deactivate ITM
+
+Dialog -> Dialog: refreshTypeList()
+Dialog -> Main: interface->saveAllData()
+activate Main
+Main -> Main: saveAllData()
+deactivate Main
+
+Admin -> Dialog: 关闭窗口
+deactivate Dialog
+deactivate Main
+@enduml

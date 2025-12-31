@@ -1,0 +1,51 @@
+@startuml Search_Item
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "User" as User
+participant "MainWindow" as Main
+participant "SearchDialog" as Dialog
+participant "Inventory" as Inv
+
+User -> Main: 点击 "搜索物品"
+activate Main
+
+Main -> Dialog: 创建()
+activate Dialog
+User -> Dialog: 输入关键字, 选择类型(或全部)
+Dialog --> Main: 返回 Accepted
+deactivate Dialog
+
+Main -> Dialog: getKeyword(), getItemType()
+
+alt 指定了类型
+    Main -> Inv: searchByTypeAndKeyword(typeName, keyword)
+    activate Inv
+    loop 遍历所有物品
+        Inv -> Inv: 匹配类型名称
+        Inv -> Inv: 匹配名称/说明/联系人(忽略大小写)
+    end
+    Inv --> Main: 返回匹配索引 vector<int>
+    deactivate Inv
+else 搜索全部类型 (GUI逻辑)
+    Main -> Inv: getItems()
+    activate Inv
+    Inv --> Main: vector<Item*>
+    deactivate Inv
+    loop 遍历所有物品
+        Main -> Main: 手动执行匹配逻辑
+    end
+end
+
+alt 找到匹配项
+    loop 对于每个匹配索引
+        Main -> Main: itemListWidget->setSelected(true)
+        Main -> Main: displayItemDetails(item)
+    end
+    Main --> User: 显示结果数量
+else 无匹配
+    Main --> User: 显示未找到提示
+end
+
+deactivate Main
+@enduml
