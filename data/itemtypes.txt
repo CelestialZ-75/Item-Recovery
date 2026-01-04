@@ -1,5 +1,0 @@
-食品|2|保质期:STRING;数量:INTEGER;
-书籍|2|作者:STRING;出版社:STRING;
-工具|1|工具状态:STRING;
-其他|0|
-家具|2|材质:STRING;新旧状态（0～1描述）:FLOAT;
